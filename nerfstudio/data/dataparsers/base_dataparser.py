@@ -190,6 +190,9 @@ def transform_poses_to_original_space(
         1,
     )
     output_poses[..., :3, 3] /= applied_scale
+    # print(poses.dtype)
+    if poses.dtype == torch.float64:
+        applied_transform = applied_transform.double()
     inv_transform = torch.linalg.inv(
         torch.cat(
             (
