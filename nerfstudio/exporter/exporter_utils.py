@@ -141,6 +141,7 @@ def generate_point_cloud(
                 sys.exit(1)
             rgba = pipeline.model.get_rgba_image(outputs, rgb_output_name)
             depth = outputs[depth_output_name]
+            ''' deactivate normal calculation
             if normal_output_name is not None:
                 if normal_output_name not in outputs:
                     CONSOLE.rule("Error", style="red")
@@ -152,6 +153,7 @@ def generate_point_cloud(
                     torch.min(normal) >= 0.0 and torch.max(normal) <= 1.0
                 ), "Normal values from method output must be in [0, 1]"
                 normal = (normal * 2.0) - 1.0
+             '''
             point = ray_bundle.origins + ray_bundle.directions * depth
             view_direction = ray_bundle.directions
 
@@ -160,17 +162,19 @@ def generate_point_cloud(
             point = point[mask]
             view_direction = view_direction[mask]
             rgb = rgba[mask][..., :3]
+            '''
             if normal is not None:
                 normal = normal[mask]
-
+            '''
             if crop_obb is not None:
                 mask = crop_obb.within(point)
-                point = point[mask]
-                rgb = rgb[mask]
-                view_direction = view_direction[mask]
-                if normal is not None:
-                    normal = normal[mask]
-
+            point = point[mask]
+            rgb = rgb[mask]
+            view_direction = view_direction[mask]
+            '''
+            if normal is not None:
+                normal = normal[mask]
+            '''
             points.append(point)
             rgbs.append(rgb)
             view_directions.append(view_direction)
@@ -195,7 +199,7 @@ def generate_point_cloud(
         CONSOLE.print("[bold green]:white_check_mark: Cleaning Point Cloud")
         if ind is not None:
             view_directions = view_directions[ind]
-
+    '''
     # either estimate_normals or normal_output_name, not both
     if estimate_normals:
         if normal_output_name is not None:
@@ -219,7 +223,7 @@ def generate_point_cloud(
         mask = torch.sum(view_directions * normals, dim=-1) > 0
         normals[mask] *= -1
         pcd.normals = o3d.utility.Vector3dVector(normals.double().cpu().numpy())
-
+    '''
     return pcd
 
 
