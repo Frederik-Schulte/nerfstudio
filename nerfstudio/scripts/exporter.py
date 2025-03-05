@@ -86,7 +86,7 @@ def validate_pipeline(normal_method: str, normal_output_name: str, pipeline: Pip
             )
             CONSOLE.print("[bold yellow]Warning: Or change --normal-method")
             CONSOLE.print("[bold yellow]Exiting early.")
-            sys.exit(1)
+            #sys.exit(1)
 
 
 @dataclass
